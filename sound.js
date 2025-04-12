@@ -38,24 +38,24 @@ positionOSC2.on('change',function(w) {
 
 const OSC1Div1 = document.getElementById('OSC1');
 OSC1Div1.addEventListener('mouseup', () => {
-    log_info("Stop synth 1 F:" + freqtrig1);
+    log_info("Stop  synth 1 F:" + freqtrig1);
     synth1.triggerRelease(freqtrig1);
     nbrVoice1 = 0;
 });
 OSC1Div1.addEventListener('touchend', () => {
-    log_info("Stop synth 1 F:" + freqtrig2);
-    synth2.triggerRelease(freqtrig2);
-    nbrVoice2 = 0;
+    log_info("Stop  synth 1 F:" + freqtrig1);
+    synth2.triggerRelease(freqtrig1);
+    nbrVoice1 = 0;
 }); 
 
 const OSC1Div2 = document.getElementById('OSC2');
 OSC1Div2.addEventListener('mouseup', () => {
-    log_info("Stop synth 2 F:" + freqtrig2);
+    log_info("Stop  synth 2 F:" + freqtrig2);
     synth2.triggerRelease(freqtrig2);
     nbrVoice2 = 0;
 }); 
 OSC1Div2.addEventListener('touchend', () => {
-    log_info("Stop synth 2 F:" + freqtrig2);
+    log_info("Stop  synth 2 F:" + freqtrig2);
     synth2.triggerRelease(freqtrig2);
     nbrVoice2 = 0;
 }); 
@@ -68,11 +68,11 @@ function noteOrfreq(curSynth, curFilter, curVoices, pos) {
     if (curVoices < 2) {
         freqtrig1 = freq1
         freqtrig2 = freq1
-        log_info("Go synth F:"  + freq1);
+        log_info("Go    synth F:"  + freq1);
         curSynth.triggerAttack(freqtrig1, Tone.now(), 1);
     }
     else{
-        log_info("Update synth F:"  + freq1  + " filter C:" + freqcut1);
+        log_info("Updat synth F:"  + freq1  + " filter C:" + freqcut1);
         curSynth.set({ frequency: freq1 });
         curFilter.set({ frequency: freqcut1 });
     }
@@ -80,6 +80,6 @@ function noteOrfreq(curSynth, curFilter, curVoices, pos) {
 
 function log_info(mytext) {
     console.log(mytext);
-    document.getElementById('displayLog').value = document.getElementById('displayLog').value + " LOG:\t" +  mytext + '\n';
+    document.getElementById('displayLog').value = document.getElementById('displayLog').value + " - " +  mytext + '\n';
     document.getElementById('displayLog').scrollTop = document.getElementById('displayLog').scrollHeight ;
 }

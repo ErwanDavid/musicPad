@@ -9,12 +9,11 @@
 
   #displayLog {
     resize: none;
-    background:#333;
+    background:#335;
     font-family: "Lucida Console", Courier, monospace;
     color:#ff0;
     overflow:hidden;
-    min-width: 500px;
-    border:1px solid black;
+    min-width: 400px;
     height: 100px;
     display: block;
     margin-left: auto;
