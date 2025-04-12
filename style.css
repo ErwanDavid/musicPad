@@ -7,3 +7,22 @@
     grid-template-columns: repeat(2, 50%);
   }
 
+  #displayLog {
+    resize: none;
+    background:#333;
+    font-family: "Lucida Console", Courier, monospace;
+    color:#ff0;
+    overflow:hidden;
+    min-width: 300px;
+    border:1px solid black;
+    height: 100px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .osc {
+    margin-left: auto;
+    margin-right: auto;
+  }
+

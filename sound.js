@@ -33,6 +33,7 @@ positionOSC1.on('change',function(v) {
     freqcut1 = 2000 * (v.x + 0.8);
     if (nbrVoice1 < 2) {
         freqtrig1 = freq1
+        log_info("Go synth 1" + freq1);
         synth1.triggerAttack(freqtrig1, Tone.now(), 1);
     }
     else{
@@ -42,17 +43,15 @@ positionOSC1.on('change',function(v) {
 })
 
 positionOSC2.on('change',function(w) {
-    console.log(w);
     nbrVoice2 = nbrVoice2 +1;
     freq2 = (330 * (w.y));
     freqcut2 = 2000 * (w.x + 0.8);
     if (nbrVoice2 < 2) {
-        console.log(freq2);
         freqtrig2 = freq2
+        log_info("Go synth 2"+ freq2);
         synth2.triggerAttack(freqtrig2, Tone.now(), 1);
     }
     else{
-        console.log(freq2);
         synth2.set({ frequency: freq2 });
         filter2.set({ frequency: freqcut2 });
     }
@@ -60,14 +59,20 @@ positionOSC2.on('change',function(w) {
 
 const OSC1Div1 = document.getElementById('OSC1');
 OSC1Div1.addEventListener('mouseup', () => {
-    console.log(nbrVoice1);
+    log_info("Stop synth 1" + freqtrig1);
     synth1.triggerRelease(freqtrig1);
     nbrVoice1 = 0;
 });
 
 const OSC1Div2 = document.getElementById('OSC2');
 OSC1Div2.addEventListener('mouseup', () => {
-    console.log(nbrVoice2);
+    log_info("Stop synth 1" + freqtrig2);
     synth2.triggerRelease(freqtrig2);
-    nbrVoice1 = 0;
+    nbrVoice2 = 0;
 });
+
+function log_info(mytext) {
+    console.log(mytext);
+    document.getElementById('displayLog').value = document.getElementById('displayLog').value + " LOG:\t" +  mytext + '\n';
+    document.getElementById('displayLog').scrollTop = document.getElementById('displayLog').scrollHeight ;
+}
