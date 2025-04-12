@@ -42,9 +42,19 @@ OSC1Div1.addEventListener('mouseup', () => {
     synth1.triggerRelease(freqtrig1);
     nbrVoice1 = 0;
 });
+OSC1Div1.addEventListener('touchend', () => {
+    log_info("Stop synth 1 F:" + freqtrig2);
+    synth2.triggerRelease(freqtrig2);
+    nbrVoice2 = 0;
+}); 
 
 const OSC1Div2 = document.getElementById('OSC2');
 OSC1Div2.addEventListener('mouseup', () => {
+    log_info("Stop synth 2 F:" + freqtrig2);
+    synth2.triggerRelease(freqtrig2);
+    nbrVoice2 = 0;
+}); 
+OSC1Div2.addEventListener('touchend', () => {
     log_info("Stop synth 2 F:" + freqtrig2);
     synth2.triggerRelease(freqtrig2);
     nbrVoice2 = 0;
