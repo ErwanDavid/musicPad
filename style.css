@@ -1,0 +1,9 @@
+#containerWith2OSC {
+    height: 100%;
+    /* background-color: var(--keyboard); */
+    /* border: 3px solid var(--keyboard-shadow); */
+    place-items: left;
+    display: grid;
+    grid-template-columns: repeat(2, 50%);
+  }
+
