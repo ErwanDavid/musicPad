@@ -16,12 +16,20 @@ const filter1 = new Tone.Filter({type : "lowpass" ,frequency : 900 ,rolloff : -1
 const synth1  = new Tone.PolySynth(Tone.Synth, {
     oscillator: {
         type: 'fatsawtooth',
-        count: 2
+        count: 1
     }
   }).toDestination();
-
+const synth2  = new Tone.PolySynth(Tone.Synth, {
+    oscillator: {
+        type: 'square',
+        count: 1
+    }
+  }).toDestination();
 Tone.Destination.chain(filter1);
 Tone.start()
+var synthArr=[];
+synthArr.push(synth1)
+synthArr.push(synth2)
 
 document.addEventListener("DOMContentLoaded", startup);
 
@@ -35,12 +43,13 @@ function handleStart(evt) {
     const el = document.getElementById("canvas");
     const ctx = el.getContext("2d");
     const touches = evt.changedTouches;
-    noteOn(freqCur, synth1);
+    var color = "#000000"
     if (typeof touches !== 'undefined')   {
         for (let i = 0; i < touches.length; i++) {
+            noteOn(freqCur, synthArr[i]);
             log(`touchstart: ${i}.`);
             ongoingTouches.push(copyTouch(touches[i]));
-            const color = colorForTouch(touches[i]);
+            color = colorForTouch(touches[i]);
             log(
                 `Couleur de cette touche avec l'identifiant ${touches[i].identifier} = ${color}`,
             );
@@ -51,6 +60,7 @@ function handleStart(evt) {
         }
     }
     else {
+        noteOn(freqCur, synth1);
         x = evt.clientX;
         y = evt.clientY;
         log(`touchstart mouse: ${x} ${y}`);
@@ -59,6 +69,10 @@ function handleStart(evt) {
         touch["pageX"] = x;
         touch["pageY"] = y;
         ongoingTouches.push(copyTouch(touch));
+        ctx.beginPath();
+        ctx.arc(touch.pageX, touch.pageY, 4, 0, 2 * Math.PI, false); // un cercle au début
+        ctx.fillStyle = color;
+        ctx.fill();
     }
 }
 
@@ -74,21 +88,22 @@ function handleMove(evt) {
             const idx = ongoingTouchIndexById(touches[i].identifier);
 
             if (idx >= 0) {
-            log(`progression du point de touche ${idx}`);
-            ctx.beginPath();
-            log(
-                `   ctx.moveTo( ${ongoingTouches[idx].pageX}, ${ongoingTouches[idx].pageY} );`,
-            );
-            ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
-            //log(`ctx.lineTo( ${touches[i].pageX}, ${touches[i].pageY} );`);
-            ctx.lineTo(touches[i].pageX, touches[i].pageY);
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = color;
-            ctx.stroke();
-            changeFreg(touches[i].pageX, touches[i].pageY,synth1, filter1 )
-            ongoingTouches.splice(idx, 1, copyTouch(touches[i])); // on met à jour le point de contact
-            } else {
-            log(`impossible de déterminer le point de contact à faire avancer`);
+                log(`progression du point de touche ${idx}`);
+                ctx.beginPath();
+                log(
+                    `   ctx.moveTo( ${ongoingTouches[idx].pageX}, ${ongoingTouches[idx].pageY} );`,
+                );
+                ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
+                //log(`ctx.lineTo( ${touches[i].pageX}, ${touches[i].pageY} );`);
+                ctx.lineTo(touches[i].pageX, touches[i].pageY);
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = color;
+                ctx.stroke();
+                changeFreg(touches[i].pageX, touches[i].pageY,synthArr[i], filter1 )
+                ongoingTouches.splice(idx, 1, copyTouch(touches[i])); // on met à jour le point de contact
+            } 
+            else {
+                    log(`impossible de déterminer le point de contact à faire avancer`);
             }
         }
     }
@@ -103,6 +118,11 @@ function handleMove(evt) {
         ctx.lineWidth = 4;
         ctx.strokeStyle = color;
         ctx.stroke();
+        var touch = new Object();
+        touch["identifier"] = 1;
+        touch["pageX"] = x;
+        touch["pageY"] = y;
+        ongoingTouches.splice(1, 1, copyTouch(touch));
 
     }
 }
@@ -113,7 +133,7 @@ function handleEnd(evt) {
     const el = document.getElementById("canvas");
     const ctx = el.getContext("2d");
     const touches = evt.changedTouches;
-    noteOff(freqCur, synth1);
+    
     if (typeof touches !== 'undefined')   {
         for (let i = 0; i < touches.length; i++) {
             const color = colorForTouch(touches[i]);
@@ -126,10 +146,14 @@ function handleEnd(evt) {
                 ctx.lineTo(touches[i].pageX, touches[i].pageY);
                 ctx.fillRect(touches[i].pageX - 4, touches[i].pageY - 4, 8, 8); // on dessine un carré à la fin
                 ongoingTouches.splice(idx, 1); // on le retire du tableau de suivi
+                noteOff(freqCur, synthArr[i]);
             } else {
                 log(`impossible de déterminer le point de contact à terminer`);
             }
         }
+    }
+    else {
+        noteOff(freqCur, synth1);
     }
 }
 
