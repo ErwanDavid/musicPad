@@ -45,12 +45,12 @@ OSC1Div1.addEventListener('mouseup', () => {
 OSC1Div1.addEventListener('touchend', () => {
     log_info("Stop synth 1 F:" + freqtrig1);
     synth2.triggerRelease(freqtrig1);
-    nbrVoice2 = 0;
+    nbrVoice1 = 0;
 }); 
 OSC1Div1.addEventListener('touchcancel', () => {
     log_info("Stop synth 1 F:" + freqtrig1);
     synth2.triggerRelease(freqtrig1);
-    nbrVoice2 = 0;
+    nbrVoice1 = 0;
 }); 
 
 const OSC1Div2 = document.getElementById('OSC2');
@@ -77,7 +77,7 @@ function noteOrfreq(curSynth, curFilter, curVoices, pos) {
         curSynth.triggerAttack(freqtrig1, Tone.now(), 1);
     }
     else{
-        log_info("Update synth F:"  + freq1  + " filter C:" + freqcut1);
+        log_info("Updat synth F:"  + freq1  + " cut " + freqcut1);
         curSynth.set({ frequency: freq1 });
         curFilter.set({ frequency: freqcut1 });
     }
@@ -85,6 +85,6 @@ function noteOrfreq(curSynth, curFilter, curVoices, pos) {
 
 function log_info(mytext) {
     console.log(mytext);
-    document.getElementById('displayLog').value = document.getElementById('displayLog').value + " LOG:\t" +  mytext + '\n';
+    document.getElementById('displayLog').value = document.getElementById('displayLog').value + ":\t" +  mytext + '\n';
     document.getElementById('displayLog').scrollTop = document.getElementById('displayLog').scrollHeight ;
 }
