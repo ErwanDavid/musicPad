@@ -56,6 +56,7 @@ function handleMove(evt) {
   const el = document.getElementById("canvas");
   const ctx = el.getContext("2d");
   const touches = evt.changedTouches;
+  log(`Mooove: ${evt}`);
 
   for (let i = 0; i < touches.length; i++) {
     const color = colorForTouch(touches[i]);
@@ -73,6 +74,7 @@ function handleMove(evt) {
       ctx.lineWidth = 4;
       ctx.strokeStyle = color;
       ctx.stroke();
+      changeFreg(touches[i].pageX, touches[i].pageY,synth1, filter1 )
 
       ongoingTouches.splice(idx, 1, copyTouch(touches[i])); // on met à jour le point de contact
     } else {
@@ -151,7 +153,23 @@ function noteOn(freq, curSynth) {
 function noteOff(freq, curSynth) {
     curSynth.triggerRelease(freq, Tone.now(), 1);
 }
-
+function changeFreg(posx, posy, curSynth, curFilter) {
+    freq1 = (660 * (posy)) + 100;
+    freq1 = freq1.toFixed(2);
+    freqcut1 = 900 * (posx + 0.2);
+    freqcut1 = freqcut1.toFixed(2);
+    if (curVoices < 2) {
+        freqtrig1 = freq1
+        freqtrig2 = freq1
+        log_info("Go synth F:"  + freq1);
+        curSynth.triggerAttack(freqtrig1, Tone.now(), 1);
+    }
+    else{
+        log_info("Updat synth F:"  + freq1  + " cut " + freqcut1);
+        curSynth.set({ frequency: freq1 });
+        curFilter.set({ frequency: freqcut1 });
+    }
+}
 
 function log(msg) {
   const container = document.getElementById("log");
