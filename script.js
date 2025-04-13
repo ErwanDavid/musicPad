@@ -31,7 +31,7 @@ var freqCur = freqStart
 
 function handleStart(evt) {
     evt.preventDefault();
-    log("touchstart.");
+    log("touchstart all");
     const el = document.getElementById("canvas");
     const ctx = el.getContext("2d");
     const touches = evt.changedTouches;
@@ -53,7 +53,7 @@ function handleStart(evt) {
     else {
         x = evt.clientX;
         y = evt.clientY;
-        log(`touchstart: ${x} ${y}`);
+        log(`touchstart mouse: ${x} ${y}`);
         var touch = new Object();
         touch["identifier"] = 1;
         touch["pageX"] = x;
@@ -77,7 +77,7 @@ function handleMove(evt) {
             log(`progression du point de touche ${idx}`);
             ctx.beginPath();
             log(
-                `ctx.moveTo( ${ongoingTouches[idx].pageX}, ${ongoingTouches[idx].pageY} );`,
+                `   ctx.moveTo( ${ongoingTouches[idx].pageX}, ${ongoingTouches[idx].pageY} );`,
             );
             ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
             //log(`ctx.lineTo( ${touches[i].pageX}, ${touches[i].pageY} );`);
@@ -156,7 +156,7 @@ function colorForTouch(touch) {
 }
 
 function copyTouch({ identifier, pageX, pageY }) {
-    log(`copyT  ${identifier}  ${pageX} - ${pageY}`);
+    log(`   copyT  ${identifier}  ${pageX} - ${pageY}`);
     return { identifier, pageX, pageY };
 }
 
@@ -181,7 +181,7 @@ function noteOff(freq, curSynth) {
 function changeFreg(posx, posy, curSynth, curFilter) {
     freq1 = posx;
     freqcut1 = (600-posy) *2;
-    log(`Filter to ${freq1} filter ${freqcut1}`)
+    log(`   Filter to ${freq1} filter ${freqcut1}`)
     curSynth.set({ frequency: freq1 });
     curFilter.set({ frequency: freqcut1 });
     
