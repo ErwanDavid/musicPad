@@ -69,7 +69,7 @@ function handleMove(evt) {
         `ctx.moveTo( ${ongoingTouches[idx].pageX}, ${ongoingTouches[idx].pageY} );`,
       );
       ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
-      log(`ctx.lineTo( ${touches[i].pageX}, ${touches[i].pageY} );`);
+      //log(`ctx.lineTo( ${touches[i].pageX}, ${touches[i].pageY} );`);
       ctx.lineTo(touches[i].pageX, touches[i].pageY);
       ctx.lineWidth = 4;
       ctx.strokeStyle = color;
@@ -154,21 +154,15 @@ function noteOff(freq, curSynth) {
     curSynth.triggerRelease(freq, Tone.now(), 1);
 }
 function changeFreg(posx, posy, curSynth, curFilter) {
+    log(`Change to  to ${posx} and ${poxy}`)
     freq1 = (660 * (posy)) + 100;
     freq1 = freq1.toFixed(2);
     freqcut1 = 900 * (posx + 0.2);
     freqcut1 = freqcut1.toFixed(2);
-    if (curVoices < 2) {
-        freqtrig1 = freq1
-        freqtrig2 = freq1
-        log_info("Go synth F:"  + freq1);
-        curSynth.triggerAttack(freqtrig1, Tone.now(), 1);
-    }
-    else{
-        log_info("Updat synth F:"  + freq1  + " cut " + freqcut1);
-        curSynth.set({ frequency: freq1 });
-        curFilter.set({ frequency: freqcut1 });
-    }
+    log(`Filter to ${freq1} filter ${freqcut1}`)
+    curSynth.set({ frequency: freq1 });
+    curFilter.set({ frequency: freqcut1 });
+    
 }
 
 function log(msg) {
