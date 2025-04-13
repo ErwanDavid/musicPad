@@ -8,47 +8,145 @@
 
 <body>
 
-<div id="touchable">This element is touchable.</div>
+    <canvas id="canvas" width="600" height="600" style="border: solid black 1px">
+        Votre navigateur ne prend pas en charge l'élément canvas.
+      </canvas>
+      <br />
+      Journal :
+      <pre id="log" style="border: 1px solid #ccc"></pre>
+      
 <script>
-document.getElementById('touchable').addEventListener('touchstart', function(ev) {
-if (ev.touches.item(0) == ev.targetTouches.item(0))
-{
-    document.write('Hello Touch Events!');
+
+function startup() {
+  const el = document.getElementById("canvas");
+  el.addEventListener("touchstart",  handleStart);
+  el.addEventListener("touchend",    handleEnd);
+  el.addEventListener("touchcancel", handleCancel);
+  el.addEventListener("touchmove",   handleMove);
+  log("Initialisation.");
 }
-if (ev.touches.length == ev.targetTouches.length)
-{
 
-    document.write('All points are on target element')
+document.addEventListener("DOMContentLoaded", startup);
+
+const ongoingTouches = [];
+
+function handleStart(evt) {
+  evt.preventDefault();
+  log("touchstart.");
+  const el = document.getElementById("canvas");
+  const ctx = el.getContext("2d");
+  const touches = evt.changedTouches;
+
+  for (let i = 0; i < touches.length; i++) {
+    log(`touchstart: ${i}.`);
+    ongoingTouches.push(copyTouch(touches[i]));
+    const color = colorForTouch(touches[i]);
+    log(
+      `Couleur de cette touche avec l'identifiant ${touches[i].identifier} = ${color}`,
+    );
+    ctx.beginPath();
+    ctx.arc(touches[i].pageX, touches[i].pageY, 4, 0, 2 * Math.PI, false); // un cercle au début
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
 }
-if (ev.touches.length > 1)
-{
 
-    document.write('Hello Multiple Touch!');
+function handleMove(evt) {
+  evt.preventDefault();
+  const el = document.getElementById("canvas");
+  const ctx = el.getContext("2d");
+  const touches = evt.changedTouches;
+
+  for (let i = 0; i < touches.length; i++) {
+    const color = colorForTouch(touches[i]);
+    const idx = ongoingTouchIndexById(touches[i].identifier);
+
+    if (idx >= 0) {
+      log(`progression du point de touche ${idx}`);
+      ctx.beginPath();
+      log(
+        `ctx.moveTo( ${ongoingTouches[idx].pageX}, ${ongoingTouches[idx].pageY} );`,
+      );
+      ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
+      log(`ctx.lineTo( ${touches[i].pageX}, ${touches[i].pageY} );`);
+      ctx.lineTo(touches[i].pageX, touches[i].pageY);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = color;
+      ctx.stroke();
+
+      ongoingTouches.splice(idx, 1, copyTouch(touches[i])); // on met à jour le point de contact
+    } else {
+      log(`impossible de déterminer le point de contact à faire avancer`);
+    }
+  }
 }
-}, false);
 
-document.getElementById('touchable').addEventListener('touchend', function(ev) {
+function handleEnd(evt) {
+  evt.preventDefault();
+  log("touchend");
+  const el = document.getElementById("canvas");
+  const ctx = el.getContext("2d");
+  const touches = evt.changedTouches;
 
-/**
- * Example output when three touch points are on the surface,
- * two of them being on the "touchable" element and one point
- * in the "touchable" element is lifted from the surface:
- *
- * Touch points removed: 1
- * Touch points left on element: 1
- * Touch points left on document: 2
- */
+  for (let i = 0; i < touches.length; i++) {
+    const color = colorForTouch(touches[i]);
+    let idx = ongoingTouchIndexById(touches[i].identifier);
 
-document.write('Touch points removed: ' + ev.changedTouches.length);
-document.write('Touch points left on element: ' + ev.targetTouches.length);
-document.write('Touch points left on document: ' + ev.touches.length);
+    if (idx >= 0) {
+      ctx.lineWidth = 4;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
+      ctx.lineTo(touches[i].pageX, touches[i].pageY);
+      ctx.fillRect(touches[i].pageX - 4, touches[i].pageY - 4, 8, 8); // on dessine un carré à la fin
+      ongoingTouches.splice(idx, 1); // on le retire du tableau de suivi
+    } else {
+      log(`impossible de déterminer le point de contact à terminer`);
+    }
+  }
+}
 
-}, false);
+function handleCancel(evt) {
+  evt.preventDefault();
+  log("touchcancel.");
+  const touches = evt.changedTouches;
 
-document.getElementById('touchable').addEventListener('mousedown', function(ev) {
+  for (let i = 0; i < touches.length; i++) {
+    let idx = ongoingTouchIndexById(touches[i].identifier);
+    ongoingTouches.splice(idx, 1); // on le retire du tableau de suivi
+  }
+}
 
-    document.write('Hello moussse');
-}, false);
+function colorForTouch(touch) {
+  let r = touch.identifier % 16;
+  let g = Math.floor(touch.identifier / 3) % 16;
+  let b = Math.floor(touch.identifier / 7) % 16;
+  r = r.toString(16); // on le transforme en chiffre hexadécimal
+  g = g.toString(16); // on le transforme en chiffre hexadécimal
+  b = b.toString(16); // on le transforme en chiffre hexadécimal
+  const color = "#" + r + g + b;
+  return color;
+}
+
+function copyTouch({ identifier, pageX, pageY }) {
+  return { identifier, pageX, pageY };
+}
+
+function ongoingTouchIndexById(idToFind) {
+  for (let i = 0; i < ongoingTouches.length; i++) {
+    const id = ongoingTouches[i].identifier;
+
+    if (id == idToFind) {
+      return i;
+    }
+  }
+  return -1; // non trouvé
+}
+
+function log(msg) {
+  const container = document.getElementById("log");
+  container.textContent = `${msg} \n${container.textContent}`;
+}
 
 
 </script>
