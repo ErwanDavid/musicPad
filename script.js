@@ -1,14 +1,23 @@
 
 function startup() {
-  const el = document.getElementById("canvas");
-  el.addEventListener("touchstart",  handleStart);
-  el.addEventListener("mousedown",  handleStart);
-  el.addEventListener("touchend",    handleEnd);
-  el.addEventListener("mouseup",    handleEnd);
-  el.addEventListener("touchcancel", handleCancel);
-  el.addEventListener("touchmove",   handleMove);
-  el.addEventListener("mousemove",   handleMove);
+  const el1 = document.getElementById("canvas1");
+  el1.addEventListener("touchstart",  handleStart);
+  el1.addEventListener("mousedown",  handleStart);
+  el1.addEventListener("touchend",    handleEnd);
+  el1.addEventListener("mouseup",    handleEnd);
+  el1.addEventListener("touchcancel", handleCancel);
+  el1.addEventListener("touchmove",   handleMove);
+  el1.addEventListener("mousemove",   handleMove);
+  const el2 = document.getElementById("canvas2");
+  el2.addEventListener("touchstart",  handleStart);
+  el2.addEventListener("mousedown",  handleStart);
+  el2.addEventListener("touchend",    handleEnd);
+  el2.addEventListener("mouseup",    handleEnd);
+  el2.addEventListener("touchcancel", handleCancel);
+  el2.addEventListener("touchmove",   handleMove);
+  el2.addEventListener("mousemove",   handleMove);
   log("Initialisation.");
+
 }
 
 const filter1 = new Tone.Filter({type : "lowpass" ,frequency : 900 ,rolloff : -12 ,Q : 0.42 ,gain : 0});
@@ -40,13 +49,27 @@ var freqCur = freqStart
 function handleStart(evt) {
     evt.preventDefault();
     log("touchstart all");
-    const el = document.getElementById("canvas");
-    const ctx = el.getContext("2d");
-    const touches = evt.changedTouches;
-    var color = "#000000"
+    var canasID=evt.target.height -600;
+    log(canasID);
+    var curSynth = null;
+    var ctx = null;
+    var touches = null;
+    if (canasID == 1) {
+        const el = document.getElementById("canvas1");
+        ctx = el.getContext("2d");
+        touches = evt.changedTouches;
+        var color = "#000000";
+        curSynth = synth1;
+    } else {
+        const el = document.getElementById("canvas2");
+        ctx = el.getContext("2d");
+        touches = evt.changedTouches;
+        var color = "#00FF00";
+        curSynth = synth2;
+    }
     if (typeof touches !== 'undefined')   {
         for (let i = 0; i < touches.length; i++) {
-            noteOn(freqCur, synthArr[i]);
+            noteOn(freqCur, curSynth);
             log(`touchstart: ${i}.`);
             ongoingTouches.push(copyTouch(touches[i]));
             color = colorForTouch(touches[i]);
@@ -60,7 +83,7 @@ function handleStart(evt) {
         }
     }
     else {
-        noteOn(freqCur, synth1);
+        noteOn(freqCur, curSynth);
         x = evt.clientX;
         y = evt.clientY;
         log(`touchstart mouse: ${x} ${y}`);
@@ -78,10 +101,24 @@ function handleStart(evt) {
 
 function handleMove(evt) {
     evt.preventDefault();
-    const el = document.getElementById("canvas");
-    const ctx = el.getContext("2d");
-    const touches = evt.changedTouches;
-    var color = "#000000"
+    var canasID=evt.target.height -600;
+    log(canasID);
+    var curSynth = null;
+    var ctx = null;
+    var touches = null;
+    if (canasID == 1) {
+        const el = document.getElementById("canvas1");
+        ctx = el.getContext("2d");
+        touches = evt.changedTouches;
+        var color = "#000000";
+        curSynth = synth1;
+    } else {
+        const el = document.getElementById("canvas2");
+        ctx = el.getContext("2d");
+        touches = evt.changedTouches;
+        var color = "#00FF00";
+        curSynth = synth2;
+    }
     if (typeof touches !== 'undefined')   {
         for (let i = 0; i < touches.length; i++) {
             color = colorForTouch(touches[i]);
@@ -99,7 +136,7 @@ function handleMove(evt) {
                 ctx.lineWidth = 4;
                 ctx.strokeStyle = color;
                 ctx.stroke();
-                changeFreg(touches[i].pageX, touches[i].pageY,synthArr[i], filter1 )
+                changeFreg(touches[i].pageX, touches[i].pageY,curSynth, filter1 )
                 ongoingTouches.splice(idx, 1, copyTouch(touches[i])); // on met à jour le point de contact
             } 
             else {
@@ -110,7 +147,7 @@ function handleMove(evt) {
     else{
         x = evt.clientX;
         y = evt.clientY;
-        changeFreg(x, y,synth1, filter1 )
+        changeFreg(x, y,curSynth, filter1 )
         ctx.beginPath();
         let idx = ongoingTouchIndexById(1);
         ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
@@ -130,9 +167,24 @@ function handleMove(evt) {
 function handleEnd(evt) {
     evt.preventDefault();
     log("touchend");
-    const el = document.getElementById("canvas");
-    const ctx = el.getContext("2d");
-    const touches = evt.changedTouches;
+    var canasID=evt.target.height -600;
+    log(canasID);
+    var curSynth = null;
+    var ctx = null;
+    var touches = null;
+    if (canasID == 1) {
+        const el = document.getElementById("canvas1");
+        ctx = el.getContext("2d");
+        touches = evt.changedTouches;
+        var color = "#000000";
+        curSynth = synth1;
+    } else {
+        const el = document.getElementById("canvas2");
+        ctx = el.getContext("2d");
+        touches = evt.changedTouches;
+        var color = "#00FF00";
+        curSynth = synth2;
+    }
     
     if (typeof touches !== 'undefined')   {
         for (let i = 0; i < touches.length; i++) {
@@ -146,14 +198,16 @@ function handleEnd(evt) {
                 ctx.lineTo(touches[i].pageX, touches[i].pageY);
                 ctx.fillRect(touches[i].pageX - 4, touches[i].pageY - 4, 8, 8); // on dessine un carré à la fin
                 ongoingTouches.splice(idx, 1); // on le retire du tableau de suivi
-                noteOff(freqCur, synthArr[i]);
+                noteOff(freqCur, curSynth);
             } else {
-                log(`impossible de déterminer le point de contact à terminer`);
+                log(`impossible synth1de déterminer le point de contact à terminer`);
             }
         }
     }
     else {
-        noteOff(freqCur, synth1);
+        noteOff(freqCur, curSynth);
+        let idx = ongoingTouchIndexById(1);
+        ongoingTouches.splice(idx, 1);
     }
 }
 
