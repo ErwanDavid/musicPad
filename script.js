@@ -50,7 +50,6 @@ function handleStart(evt) {
     evt.preventDefault();
     log("touchstart all");
     var canasID=evt.target.height -600;
-    log(canasID);
     var curSynth = null;
     var ctx = null;
     var touches = null;
@@ -102,7 +101,6 @@ function handleStart(evt) {
 function handleMove(evt) {
     evt.preventDefault();
     var canasID=evt.target.height -600;
-    log(canasID);
     var curSynth = null;
     var ctx = null;
     var touches = null;
@@ -136,7 +134,7 @@ function handleMove(evt) {
                 ctx.lineWidth = 4;
                 ctx.strokeStyle = color;
                 ctx.stroke();
-                changeFreg(touches[i].pageX, touches[i].pageY,curSynth, filter1 )
+                changeFreg(touches[i].pageX, touches[i].pageY,curSynth, filter1, canasID)
                 ongoingTouches.splice(idx, 1, copyTouch(touches[i])); // on met à jour le point de contact
             } 
             else {
@@ -147,7 +145,7 @@ function handleMove(evt) {
     else{
         x = evt.clientX;
         y = evt.clientY;
-        changeFreg(x, y,curSynth, filter1 )
+        changeFreg(x, y,curSynth, filter1 , canasID)
         ctx.beginPath();
         let idx = ongoingTouchIndexById(1);
         ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
@@ -234,7 +232,7 @@ function colorForTouch(touch) {
 }
 
 function copyTouch({ identifier, pageX, pageY }) {
-    log(`   copyT  ${identifier}  ${pageX} - ${pageY}`);
+    //log(`   copyT  ${identifier}  ${pageX} - ${pageY}`);
     return { identifier, pageX, pageY };
 }
 
@@ -256,10 +254,14 @@ function noteOn(freq, curSynth) {
 function noteOff(freq, curSynth) {
     curSynth.triggerRelease(freq, Tone.now(), 1);
 }
-function changeFreg(posx, posy, curSynth, curFilter) {
-    freq1 = posx;
+function changeFreg(posx, posy, curSynth, curFilter, id) {
+    if (id == 1) {
+        freq1 = posx/2;
+    } else {
+        freq1 = posx/4;
+    }
     freqcut1 = (600-posy) *2;
-    log(`   Filter to ${freq1} filter ${freqcut1}`)
+    //log(`   Filter to ${freq1} filter ${freqcut1}`)
     curSynth.set({ frequency: freq1 });
     curFilter.set({ frequency: freqcut1 });
     
