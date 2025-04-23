@@ -21,7 +21,6 @@ function startup() {
 }
 
 const filter1 = new Tone.Filter({type : "lowpass" ,frequency : 900 ,rolloff : -12 ,Q : 0.42 ,gain : 0});
-
 const synth1  = new Tone.PolySynth(Tone.Synth, {
     oscillator: {
         type: 'fatsawtooth',
@@ -36,9 +35,6 @@ const synth2  = new Tone.PolySynth(Tone.Synth, {
   }).toDestination();
 Tone.Destination.chain(filter1);
 Tone.start()
-var synthArr=[];
-synthArr.push(synth1)
-synthArr.push(synth2)
 
 document.addEventListener("DOMContentLoaded", startup);
 
@@ -90,7 +86,6 @@ function handleStart(evt) {
     }
     else {
         noteOn(freqCur, curSynth);
-       
         log(` ${canasID} touchstart mouse: ${x} ${y}`);
         var touch = new Object();
         touch["identifier"] = canasID;
@@ -174,9 +169,9 @@ function handleMove(evt) {
             touch["pageY"] = y;
             ongoingTouches.splice(idx, 1, copyTouch(touch));
         }
-        else {
+/*         else {
             log(`impossible de déterminer le point de contact à faire avancer`);
-    }
+        } */
     }
 }
 
@@ -249,7 +244,7 @@ function colorForTouch(touch) {
 }
 
 function copyTouch({ identifier, pageX, pageY }) {
-    log(`   copyT  ${identifier}  ${pageX} - ${pageY} `);
+    //log(`   copyT  ${identifier}  ${pageX} - ${pageY} `);
     return { identifier, pageX, pageY };
 }
 
@@ -258,11 +253,11 @@ function ongoingTouchIndexById(idToFind) {
     const id = ongoingTouches[i].identifier;
 
     if (id == idToFind) {
-        log(`     find in table  ${idToFind} `);
+       // log(`     find in table  ${idToFind} `);
       return i;
     }
   }
-  log(`     NOT find in table  ${idToFind} `);
+  //log(`     NOT find in table  ${idToFind} `);
   return -1; // non trouvé
 }
 
