@@ -30,7 +30,7 @@ const synth1  = new Tone.PolySynth(Tone.Synth, {
   }).toDestination();
 const synth2  = new Tone.PolySynth(Tone.Synth, {
     oscillator: {
-        type: 'square',
+        type: 'sawtooth',
         count: 1
     }
   }).toDestination();
@@ -47,24 +47,31 @@ const freqStart = 220;
 var freqCur = freqStart
 
 function handleStart(evt) {
-    evt.preventDefault();
-    log("touchstart all");
+    evt.preventDefault()
     var canasID=evt.target.height -600;
+    var el = null;
     var curSynth = null;
     var ctx = null;
     var touches = null;
+    var color = null;
+    var x = null;
+    var y = null;
     if (canasID == 1) {
-        const el = document.getElementById("canvas1");
+        el = document.getElementById("canvas1");
         ctx = el.getContext("2d");
         touches = evt.changedTouches;
-        var color = "#000000";
+        color = "#0000FF";
         curSynth = synth1;
+        x = evt.clientX;
+        y = evt.clientY;
     } else {
-        const el = document.getElementById("canvas2");
+        el = document.getElementById("canvas2");
         ctx = el.getContext("2d");
         touches = evt.changedTouches;
-        var color = "#00FF00";
+        color = "#00FF00";
         curSynth = synth2;
+        x = evt.clientX - 400;
+        y = evt.clientY;
     }
     if (typeof touches !== 'undefined')   {
         for (let i = 0; i < touches.length; i++) {
@@ -83,11 +90,10 @@ function handleStart(evt) {
     }
     else {
         noteOn(freqCur, curSynth);
-        x = evt.clientX;
-        y = evt.clientY;
-        log(`touchstart mouse: ${x} ${y}`);
+       
+        log(` ${canasID} touchstart mouse: ${x} ${y}`);
         var touch = new Object();
-        touch["identifier"] = 1;
+        touch["identifier"] = canasID;
         touch["pageX"] = x;
         touch["pageY"] = y;
         ongoingTouches.push(copyTouch(touch));
@@ -101,21 +107,29 @@ function handleStart(evt) {
 function handleMove(evt) {
     evt.preventDefault();
     var canasID=evt.target.height -600;
+    var el = null;
     var curSynth = null;
     var ctx = null;
     var touches = null;
+    var color = null;
+    var x = null;
+    var y = null;
     if (canasID == 1) {
-        const el = document.getElementById("canvas1");
+        el = document.getElementById("canvas1");
         ctx = el.getContext("2d");
         touches = evt.changedTouches;
-        var color = "#000000";
+        color = "#0000FF";
         curSynth = synth1;
+        x = evt.clientX;
+        y = evt.clientY;
     } else {
-        const el = document.getElementById("canvas2");
+        el = document.getElementById("canvas2");
         ctx = el.getContext("2d");
         touches = evt.changedTouches;
-        var color = "#00FF00";
+        color = "#00FF00";
         curSynth = synth2;
+        x = evt.clientX - 400;
+        y = evt.clientY;
     }
     if (typeof touches !== 'undefined')   {
         for (let i = 0; i < touches.length; i++) {
@@ -143,22 +157,26 @@ function handleMove(evt) {
         }
     }
     else{
-        x = evt.clientX;
-        y = evt.clientY;
+        log(` ${canasID} touch move mouse: ${x} ${y}`);
         changeFreg(x, y,curSynth, filter1 , canasID)
-        ctx.beginPath();
-        let idx = ongoingTouchIndexById(1);
-        ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
-        ctx.lineTo(x ,y);
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = color;
-        ctx.stroke();
-        var touch = new Object();
-        touch["identifier"] = 1;
-        touch["pageX"] = x;
-        touch["pageY"] = y;
-        ongoingTouches.splice(1, 1, copyTouch(touch));
-
+        
+        let idx = ongoingTouchIndexById(canasID);
+        if (idx >= 0) {
+            ctx.beginPath();
+            ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
+            ctx.lineTo(x ,y);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = color;
+            ctx.stroke();
+            var touch = new Object();
+            touch["identifier"] = canasID;
+            touch["pageX"] = x;
+            touch["pageY"] = y;
+            ongoingTouches.splice(idx, 1, copyTouch(touch));
+        }
+        else {
+            log(`impossible de déterminer le point de contact à faire avancer`);
+    }
     }
 }
 
@@ -166,7 +184,6 @@ function handleEnd(evt) {
     evt.preventDefault();
     log("touchend");
     var canasID=evt.target.height -600;
-    log(canasID);
     var curSynth = null;
     var ctx = null;
     var touches = null;
@@ -204,7 +221,7 @@ function handleEnd(evt) {
     }
     else {
         noteOff(freqCur, curSynth);
-        let idx = ongoingTouchIndexById(1);
+        let idx = ongoingTouchIndexById(canasID);
         ongoingTouches.splice(idx, 1);
     }
 }
@@ -232,7 +249,7 @@ function colorForTouch(touch) {
 }
 
 function copyTouch({ identifier, pageX, pageY }) {
-    //log(`   copyT  ${identifier}  ${pageX} - ${pageY}`);
+    log(`   copyT  ${identifier}  ${pageX} - ${pageY} `);
     return { identifier, pageX, pageY };
 }
 
@@ -241,9 +258,11 @@ function ongoingTouchIndexById(idToFind) {
     const id = ongoingTouches[i].identifier;
 
     if (id == idToFind) {
+        log(`     find in table  ${idToFind} `);
       return i;
     }
   }
+  log(`     NOT find in table  ${idToFind} `);
   return -1; // non trouvé
 }
 
